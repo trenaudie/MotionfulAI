@@ -1,0 +1,23 @@
+{
+  "name": "motionful_ai",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "start": "vite",
+    "serve": "vite",
+    "build": "tsc && vite build"
+  },
+  "dependencies": {
+    "@motion-canvas/core": "file:../motion-canvas/packages/core",
+    "@motion-canvas/2d": "file:../motion-canvas/packages/2d",
+    "@motion-canvas/ffmpeg": "file:../motion-canvas/packages/ffmpeg",
+    "@motion-canvas/ui": "file:../motion-canvas/packages/ui",
+    "@motion-canvas/vite-plugin": "file:../motion-canvas/packages/vite-plugin"
+  },
+  "devDependencies": {
+    "@motion-canvas/ui": "^3.17.2",
+    "@motion-canvas/vite-plugin": "^3.17.2",
+    "typescript": "^5.2.2",
+    "vite": "^4.0.0"
+  }
+}
