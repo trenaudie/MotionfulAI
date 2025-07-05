@@ -5,7 +5,9 @@
   "scripts": {
     "start": "vite",
     "serve": "vite",
-    "build": "tsc && vite build"
+    "build": "tsc && vite build",
+    "build:motion-canvas": "npx --prefix ../motion-canvas  lerna run  build",
+    "build:all": "npm run build:motion-canvas && npm run build"
   },
   "dependencies": {
     "@motion-canvas/core": "file:../motion-canvas/packages/core",
