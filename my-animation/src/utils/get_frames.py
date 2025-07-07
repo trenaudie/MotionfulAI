@@ -636,8 +636,8 @@ import time
 # Config
 VITE_DEV_PORT = 9000
 PROJECT_URL = f"http://localhost:{VITE_DEV_PORT}"
-OUTPUT_DIR = "out2"
-OUTPUT_LOG_JSON = "out2_text.json"
+OUTPUT_DIR = "my-animation\\out2"
+OUTPUT_LOG_JSON = "my-animation\\out2_json"
 CAPTURE_INTERVAL = 1 / 30  # ~30 FPS
 MAX_TOTAL_FRAMES = 5000
 IMAGE_FORMAT = "png"

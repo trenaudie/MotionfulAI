@@ -1,0 +1,53 @@
+{
+  "summary": "The animation consists of a single teal circle appearing and growing on a transparent background.",
+  "overallScore": 9,
+  "frames": [
+    {
+      "frameIndex": 0,
+      "timestamp": 0.00,
+      "qualityScore": 10,
+      "objectsDetected": ["teal circle"],
+      "dominantColors": ["teal", "transparent"],
+      "compositionNotes": "The teal circle is centered and small.",
+      "issues": []
+    },
+    {
+      "frameIndex": 1,
+      "timestamp": 1.25,
+      "qualityScore": 10,
+      "objectsDetected": ["teal circle"],
+      "dominantColors": ["teal", "transparent"],
+      "compositionNotes": "The teal circle is centered and slightly larger.",
+      "issues": []
+    },
+    {
+      "frameIndex": 2,
+      "timestamp": 2.50,
+      "qualityScore": 10,
+      "objectsDetected": ["teal circle"],
+      "dominantColors": ["teal", "transparent"],
+      "compositionNotes": "The teal circle is centered and larger.",
+      "issues": []
+    },
+    {
+      "frameIndex": 3,
+      "timestamp": 3.75,
+      "qualityScore": 10,
+      "objectsDetected": ["teal circle"],
+      "dominantColors": ["teal", "transparent"],
+      "compositionNotes": "The teal circle is centered and larger.",
+      "issues": []
+    },
+    {
+      "frameIndex": 4,
+      "timestamp": 5.00,
+      "qualityScore": 10,
+      "objectsDetected": ["teal circle"],
+      "dominantColors": ["teal", "transparent"],
+      "compositionNotes": "The teal circle is centered and largest.",
+      "issues": []
+    }
+  ],
+  "recommendations": [],
+  "processingTime": 0
+}
