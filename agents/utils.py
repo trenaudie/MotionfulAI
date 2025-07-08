@@ -1,20 +1,27 @@
 from pydantic import create_model, BaseModel
-from typing import Dict, Any, Type
 import re
 from typing import Optional
+from typing import Literal, get_args, get_origin, Any, Type, Dict, List, Tuple
+from pydantic import create_model, BaseModel
 
-
-def build_model_from_structure(name: str, structure: dict) -> Type[BaseModel]:
-    fields = {}
+def build_model_from_structure(
+    name: str,
+    structure: Dict[str, Any],
+) -> Type[BaseModel]:
+    fields: Dict[str, Tuple[Any, ...]] = {}
     for key, value in structure.items():
+        # If the value is a dict, recurse to make a sub-model
         if isinstance(value, dict):
-            # Recursively create a submodel
             submodel = build_model_from_structure(f"{name}_{key}", value)
             fields[key] = (submodel, ...)
+        # If the value is a list, interpret it as a Literal choice
+        elif isinstance(value, list) and all(isinstance(item, str) for item in value):
+            literal_type = Literal[tuple(value)]  # e.g. Literal["success","update"]
+            fields[key] = (literal_type, ...)
+        # Otherwise fall back to str
         else:
-            fields[key] = (str, ...)  # Treat leaf nodes as strings for now
+            fields[key] = (str, ...)
     return create_model(name, **fields)
-
 
 
 def parse_markdown_output(markdown: str) -> Optional[str]:

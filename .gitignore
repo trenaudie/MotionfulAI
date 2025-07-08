@@ -19,3 +19,6 @@ project.meta
 .env
 **/__pycache__
 __pycache__
+
+motion-canvas
+video-animations

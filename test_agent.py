@@ -1,6 +1,7 @@
 #%%
 from fileinput import filename
-from agents.agents import CoderGeneralAgent
+from agents.coder_general_agent import CoderGeneralAgent
+from agents.verify_update_agent import VerifyUpdateAgent
 from pathlib import Path
 from typing import List, Dict
 
@@ -8,18 +9,8 @@ coderagent = CoderGeneralAgent()
 filepath, status = coderagent.generate_code('create a bouncing circle animation using motion-canvas')
 # Define symbolic example list (from frontend/src/scenes2)
 
+verify_update_agent = VerifyUpdateAgent()
 
-
-
-extra_examples = [
-    "example3.tsx",
-    "example4.tsx",
-    "example5.tsx",
-    "example6.tsx",
-    "example7.tsx",
-    "example8.tsx",
-    "example9_circle_cat.tsx",
-]
 
 
 # old_Examples_dir = "/Users/tanguy.renaudie/motion_canvas_projects/lablab_hack/frontend/src/motion_canvas_examples"

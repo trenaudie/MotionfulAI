@@ -17,8 +17,3 @@ class Agent:
         else:
             return "dummy.tsx", "success"
 
-class CoderGeneralAgent(Agent):
-    def __init__(self):
-        super().__init__('coder_general_01', os.path.join(AGENTS_PROMPTS_DIR, 'coder_general_01.yaml'))
-            
-    

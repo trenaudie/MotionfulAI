@@ -76,10 +76,3 @@ class CoderGeneralAgent(Agent):
     def parse_output(self, output: str) -> str:
         print(f'parser received output:{output}')
         return parse_markdown_output(output)
-
-#%% 
-
-coder_general_agent = CoderGeneralAgent()
-#%% 
-code_parsed, reasoning = coder_general_agent.generate_code('create a bouncing circle animation using motion-canvas')
-#%% 
