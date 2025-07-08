@@ -8,7 +8,10 @@ import asyncio
 import sys
 import os
 import time
+import json
+import re
 from pathlib import Path
+from datetime import datetime
 
 # Add the project root to the path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -202,6 +205,121 @@ class SVGPipeline:
         except Exception as e:
             print(f"❌ Search error: {e}")
             return []
+    
+    def download_by_search(self, query: str, limit: int = 5, download_dir: str = "downloads"):
+        """Download SVG assets based on search query"""
+        print(f"🔍 Searching and downloading assets for: '{query}'")
+        
+        try:
+            # Step 1: Search for assets using existing search function
+            search_results = self.search_assets(query, limit)
+            
+            if not search_results:
+                print(f"❌ No assets found for query: '{query}'")
+                return []
+            
+            print(f"📦 Found {len(search_results)} assets to download")
+            
+            # Step 2: Create download directory structure
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            safe_query = re.sub(r'[^\w\s-]', '', query).strip()
+            safe_query = re.sub(r'[-\s]+', '_', safe_query)
+            
+            download_path = Path(download_dir) / f"{safe_query}_{timestamp}"
+            download_path.mkdir(parents=True, exist_ok=True)
+            
+            print(f"📁 Created download directory: {download_path}")
+            
+            # Step 3: Download each asset
+            downloaded_files = []
+            failed_downloads = []
+            
+            for i, result in enumerate(search_results, 1):
+                try:
+                    print(f"  📥 Downloading {i}/{len(search_results)}: {result['title']}")
+                    
+                    # Get full asset data including SVG content
+                    asset_data = self.db.execute_query("""
+                        SELECT a.ASSET_ID, a.TITLE, a.DESCRIPTION, a.CATEGORY, 
+                               a.SOURCE_URL, c.SVG_DATA
+                        FROM SVG_ASSETS a
+                        JOIN SVG_CONTENT c ON a.ASSET_ID = c.ASSET_ID
+                        WHERE a.TITLE = %s AND a.SOURCE_URL = %s
+                        LIMIT 1
+                    """, [result['title'], result['source_url']])
+                    
+                    if not asset_data:
+                        failed_downloads.append(f"No data found for: {result['title']}")
+                        continue
+                    
+                    asset = asset_data[0]
+                    
+                    # Extract SVG content from JSON
+                    svg_data = json.loads(asset['SVG_DATA']) if isinstance(asset['SVG_DATA'], str) else asset['SVG_DATA']
+                    svg_content = svg_data.get('svg_content', '')
+                    
+                    if not svg_content:
+                        failed_downloads.append(f"No SVG content for: {result['title']}")
+                        continue
+                    
+                    # Create safe filename
+                    safe_title = re.sub(r'[^\w\s-]', '', asset['TITLE']).strip()
+                    safe_title = re.sub(r'[-\s]+', '_', safe_title)
+                    filename = f"{safe_title}_{asset['ASSET_ID'][:8]}.svg"
+                    
+                    # Save SVG file
+                    file_path = download_path / filename
+                    with open(file_path, 'w', encoding='utf-8') as f:
+                        f.write(svg_content)
+                    
+                    downloaded_files.append({
+                        'filename': filename,
+                        'title': asset['TITLE'],
+                        'category': asset['CATEGORY'],
+                        'similarity': result['similarity'],
+                        'file_path': str(file_path)
+                    })
+                    
+                    print(f"    ✅ Saved: {filename}")
+                    
+                except Exception as e:
+                    error_msg = f"Failed to download {result['title']}: {e}"
+                    failed_downloads.append(error_msg)
+                    print(f"    ❌ {error_msg}")
+            
+            # Step 4: Create download summary
+            summary_file = download_path / "download_summary.json"
+            summary = {
+                'query': query,
+                'timestamp': timestamp,
+                'total_found': len(search_results),
+                'successfully_downloaded': len(downloaded_files),
+                'failed_downloads': len(failed_downloads),
+                'download_directory': str(download_path),
+                'files': downloaded_files,
+                'errors': failed_downloads
+            }
+            
+            with open(summary_file, 'w', encoding='utf-8') as f:
+                json.dump(summary, f, indent=2, ensure_ascii=False)
+            
+            # Step 5: Print summary
+            print(f"\n📊 Download Summary:")
+            print(f"  🔍 Query: '{query}'")
+            print(f"  📁 Directory: {download_path}")
+            print(f"  ✅ Successfully downloaded: {len(downloaded_files)}")
+            print(f"  ❌ Failed downloads: {len(failed_downloads)}")
+            
+            if failed_downloads:
+                print(f"  ⚠️  Errors:")
+                for error in failed_downloads:
+                    print(f"    - {error}")
+            
+            return downloaded_files
+            
+        except Exception as e:
+            print(f"❌ Download error: {e}")
+            return []
 
 async def main():
     """Main pipeline execution"""
@@ -243,10 +361,44 @@ async def main():
     for i, result in enumerate(search_results[:3], 1):
         print(f"  {i}. {result['title']} (similarity: {result['similarity']:.3f})")
     
+    # Step 7: Test download functionality
+    print("\n📥 Testing download functionality:")
+    downloaded_files = pipeline.download_by_search("business icon", limit=2, download_dir="test_downloads")
+    
     elapsed_time = time.time() - start_time
     print(f"\n🎉 Pipeline completed in {elapsed_time:.2f} seconds")
     print(f"✅ Successfully processed {stored_count} assets with {embedded_count} embeddings")
+    if downloaded_files:
+        print(f"📁 Downloaded {len(downloaded_files)} files for testing")
+
+async def download_assets_example():
+    """Example function showing how to use download functionality independently"""
+    print("🚀 SVG Asset Download Example...")
+    
+    pipeline = SVGPipeline()
+    
+    # Example 1: Download business icons
+    print("\n📥 Example 1: Downloading business icons...")
+    business_files = pipeline.download_by_search("business icon", limit=3, download_dir="downloads/business")
+    
+    # Example 2: Download technology assets
+    print("\n📥 Example 2: Downloading technology assets...")
+    tech_files = pipeline.download_by_search("technology computer", limit=2, download_dir="downloads/technology")
+    
+    # Example 3: Download education icons
+    print("\n📥 Example 3: Downloading education icons...")
+    edu_files = pipeline.download_by_search("education school", limit=2, download_dir="downloads/education")
+    
+    total_downloaded = len(business_files) + len(tech_files) + len(edu_files)
+    print(f"\n🎉 Download examples completed!")
+    print(f"📁 Total files downloaded: {total_downloaded}")
 
 if __name__ == "__main__":
-    # Run the pipeline
-    asyncio.run(main()) 
+    import sys
+    
+    if len(sys.argv) > 1 and sys.argv[1] == "download":
+        # Run download examples only
+        asyncio.run(download_assets_example())
+    else:
+        # Run the full pipeline
+        asyncio.run(main())
