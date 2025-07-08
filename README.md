@@ -14,6 +14,9 @@ The core project will be an agent workflow that:
 The tool will use Claude Code (or other chat based SDK) to view the files and edit them. 
 We will need to build an asynchronous rendering function for Motion Canvas to feed results into a Multi Modal LLM 
 
+Style and optimization notes: 
+Ideally the project would be tailored for maths visualizations and black on white clean assets, for excalidraw-esque explanatory slides, with animations. 
+
 ## Project structure
 package.json : all available npm commands for this project
 
