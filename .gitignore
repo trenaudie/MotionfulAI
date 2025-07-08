@@ -17,3 +17,5 @@ dist
 **/scenes2/*.meta
 project.meta
 .env
+**/__pycache__
+__pycache__

@@ -33,7 +33,7 @@ extra_examples = [
 #         shutil.copy(os.path.join(old_Examples_dir, file), os.path.join(new_examples_dir, file))
 # #%% 
 
-
+import openai
 
 # %%
 system_prompt = build_system_prompt(coderagent.yaml_template, [Path(EXTRA_EXAMPLES_DIR)])

@@ -1,13 +1,14 @@
-
-EXTRA_EXAMPLES_DIR = "/Users/tanguy.renaudie/motion_canvas_projects/lablab_hack/frontend/src/extra_examples"
+#%%
 from agents.agents import Agent
 from pathlib import Path
 from typing import List, Dict
 import os
 from paths import AGENTS_PROMPTS_DIR
-from utils import build_model_from_structure
 import yaml
+from agents.utils import build_model_from_structure, parse_markdown_output
 from ai_utils.openai import chat_completion_structured, OpenAIModels
+assert os.getenv("OPENAI_API_KEY") is not None, "OPENAI_API_KEY is not set"
+EXTRA_EXAMPLES_DIR = "/Users/tanguy.renaudie/motion_canvas_projects/lablab_hack/frontend/src/extra_examples"
 yaml_data = yaml.safe_load(open("agents/prompts/coder_general_01.yaml"))
 output_template_str = yaml_data["output_template"]
 output_template_dict = yaml.safe_load(output_template_str)
@@ -34,7 +35,7 @@ def build_system_prompt_coder_general(agent_config: dict, extra_example_dirs: Li
     system_prompt = (
         f"{system_base.strip()}\n\n"
         f"EXAMPLES:\n{formatted_examples}\n\n"
-        f"OUTPUT TEMPLATE:\n{output_template.strip()}"
+        f"OUTPUT TEMPLATE (CRITICAL):\nYou must follow this exact output template. Make sure to including the reasoning, the code, and place the code in a typescript code block. {output_template.strip()}"
     )
 
     return system_prompt
@@ -65,9 +66,20 @@ class CoderGeneralAgent(Agent):
         if dummy:
             return "dummy.tsx", "success"
         system_prompt = build_system_prompt_coder_general(self.yaml_template, [Path(EXTRA_EXAMPLES_DIR)])
-        print(f'system_prompt: {system_prompt[:500]}')
         output = chat_completion_structured(OpenAIModels.GPT_4_1_NANO, system_prompt, prompt, DynamicResponseModel)
+        print(f'output: {output}')
+        print(f' type of output: {type(output)}')
         code = output.Output.code
+        code_parsed = self.parse_output(code)
         reasoning = output.Reasoning
-        return code, reasoning
+        return code_parsed, reasoning
+    def parse_output(self, output: str) -> str:
+        print(f'parser received output:{output}')
+        return parse_markdown_output(output)
 
+#%% 
+
+coder_general_agent = CoderGeneralAgent()
+#%% 
+code_parsed, reasoning = coder_general_agent.generate_code('create a bouncing circle animation using motion-canvas')
+#%% 
