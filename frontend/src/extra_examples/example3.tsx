@@ -14,8 +14,8 @@ import {
   easeOutCirc,
   createEaseInOutBack,
   range,
+  InterpolationFunction
 } from '@motion-canvas/core';
-import { InterpolationFunction } from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   // How to build the layout rectangles

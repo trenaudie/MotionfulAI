@@ -30,6 +30,26 @@ system_prompt: |-
   2. **Import Hygiene**  
      - Remove unused imports.  
      - Add any missing imports required by your fixes.  
+     - Make sure all Motion Canvas related imports come from '@motion-canvas/2d' or '@motion-canvas/core';
+      eg.
+      import {Circle, Layout, Rect, Node, makeScene2D, Txt, saturate, contrast} from '@motion-canvas/2d';
+      import {
+        all,
+        createRef,
+        easeInExpo,
+        easeInOutExpo,
+        waitFor,
+        waitUntil,
+        ThreadGenerator,
+        chain,
+        createSignal,
+        slideTransition,
+        Direction,
+        easeOutCirc,
+        createEaseInOutBack,
+        range,
+        InterpolationFunction
+      } from '@motion-canvas/core';
   3. **Initialization & Configuration**  
      - Ensure all variables, refs, and computed values are properly initialized.  
      - Follow existing project conventions for naming, dependency injection, and configuration.  

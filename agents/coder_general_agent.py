@@ -6,7 +6,7 @@ import os
 from paths import AGENTS_PROMPTS_DIR
 import yaml
 from agents.utils import build_model_from_structure, parse_markdown_output
-from ai_utils.openai import chat_completion_structured, OpenAIModels
+from ai_utils.openai_api import chat_completion_structured, OpenAIModels
 assert os.getenv("OPENAI_API_KEY") is not None, "OPENAI_API_KEY is not set"
 EXTRA_EXAMPLES_DIR = "/Users/tanguy.renaudie/motion_canvas_projects/lablab_hack/frontend/src/extra_examples"
 yaml_data = yaml.safe_load(open("agents/prompts/coder_general_01.yaml"))
@@ -59,17 +59,18 @@ def load_additional_examples_from_files(
 
 
 class CoderGeneralAgent(Agent):
-    def __init__(self):
+    def __init__(self, model: OpenAIModels = OpenAIModels.GPT_4_1_NANO):
         super().__init__('coder_general_01', os.path.join(AGENTS_PROMPTS_DIR, 'coder_general_01.yaml'))
-        
+        self.model = model
     def generate_code(self, prompt : str, dummy : bool = False):
         if dummy:
             return "dummy.tsx", "success"
         system_prompt = build_system_prompt_coder_general(self.yaml_template, [Path(EXTRA_EXAMPLES_DIR)])
-        output = chat_completion_structured(OpenAIModels.GPT_4_1_NANO, system_prompt, prompt, DynamicResponseModel)
+        output = chat_completion_structured(self.model, system_prompt, prompt, DynamicResponseModel)
         print(f'output: {output}')
         print(f' type of output: {type(output)}')
         code = output.Output.code
+        print(f'raw code output: {code}')
         code_parsed = self.parse_output(code)
         reasoning = output.Reasoning
         return code_parsed, reasoning

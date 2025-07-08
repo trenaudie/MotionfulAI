@@ -5,16 +5,16 @@ import os
 import yaml
 from paths import AGENTS_PROMPTS_DIR
 from agents.utils import build_model_from_structure, parse_markdown_output
-from ai_utils.openai import chat_completion_structured, OpenAIModels
+from ai_utils.openai_api import chat_completion_structured, OpenAIModels
 
 assert os.getenv("OPENAI_API_KEY") is not None, "OPENAI_API_KEY is not set"
 
 class VerifyUpdateAgent(Agent):
-    def __init__(self):
+    def __init__(self, model: OpenAIModels = OpenAIModels.GPT_4_1_NANO):
         # Initialize with the prompt YAML for the VerifyUpdateAgent
         prompt_path = os.path.join(AGENTS_PROMPTS_DIR, 'verify_update_agent.yaml')
         super().__init__('verify_update_agent', prompt_path)
-        
+        self.model = model
         # Load and parse the YAML to get the output_template and other config
         yaml_data = yaml.safe_load(open(prompt_path))
         self.system_base = yaml_data.get("system_prompt", "")
@@ -58,16 +58,11 @@ class VerifyUpdateAgent(Agent):
         system_prompt = self.build_system_prompt()
         
         # Build the user prompt
-        user_parts = ['Task: "Verify and update the following code file for errors and mistakes."']
-        if issues_description:
-            user_parts.append(f"Issues: {issues_description}")
-        user_parts.append("File:")
-        user_parts.append(f"```{file_content}```")
-        user_prompt = "\n\n".join(user_parts)
+        user_prompt = f"```typescript\n{file_content}\n```"
         
         # Call the model
         response = chat_completion_structured(
-            OpenAIModels.GPT_4_1_NANO,
+            self.model,
             system_prompt,
             user_prompt,
             self.ResponseModel
@@ -75,7 +70,12 @@ class VerifyUpdateAgent(Agent):
         
         # Extract and parse
         reasoning = response.Reasoning
-        raw_file = response.Output.file
-        updated_file = parse_markdown_output(raw_file)
-        
-        return updated_file, reasoning
+        raw_code = response.Output.code
+        status = response.Output.status
+        print(f'received status: {status}')
+        print(f'received code: {raw_code[:100]}...')
+        if status=="success":
+            print(f'returning code: {file_content[:100]}...')
+            return file_content, reasoning
+        updated_file = parse_markdown_output(raw_code)
+        return updated_file, status
