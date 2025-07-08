@@ -17,10 +17,7 @@ os.makedirs(SCENES_DIR, exist_ok=True)
 
 
 def run_code_generation(prompt, dummy : bool = False):
-    # choose an agent (e.g., 'generate_scene')
 
-    # here, integrate with AI tool (Claude, Llama, etc.)
-    # For example: code_ts = call_ai(agent, prompt)
     coder_general_agent = CoderGeneralAgent()
     filepath, status = coder_general_agent.generate_code(prompt)
     if status == 'success':

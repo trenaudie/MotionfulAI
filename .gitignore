@@ -16,3 +16,4 @@ dist
 
 **/scenes2/*.meta
 project.meta
+.env
