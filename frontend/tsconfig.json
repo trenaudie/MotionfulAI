@@ -1,4 +1,24 @@
+// {
+//   "extends": "@motion-canvas/2d/tsconfig.project.json",
+//   "compilerOptions": {
+//     "jsx": "react-jsx"
+//   },
+//   "include": ["src"]
+// }/
+
 {
-  "extends": "@motion-canvas/2d/tsconfig.project.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
+  },
   "include": ["src"]
 }
+

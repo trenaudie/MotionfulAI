@@ -22,7 +22,9 @@ export async function generateScene(prompt: string) {
 
 const filename = await generateScene('create a bouncing circle animation using motion-canvas');
 let filenameWithoutExtension :string= filename.split('.')[0];
-const sceneModule = await import(`./scenes/${filenameWithoutExtension}?scene`);
+const sceneModule = await import(/* @vite-ignore */ `./scenes/${filenameWithoutExtension}?scene`);
+console.log("Scene module loaded:", sceneModule);
+
 const example = sceneModule.default;
 export default makeProject({
   scenes: [example],
