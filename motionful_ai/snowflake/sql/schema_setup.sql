@@ -1,0 +1,114 @@
+/*# motionful_ai/requirements.txt
+# -snowflake-connector-python>=3.0.0
+# -pandas>=1.5.0
+# -numpy>=1.21.0
+# -streamlit>=1.28.0
+# -plotly>=5.0.0
+# -requests>=2.28.0
+# -beautifulsoup4>=4.11.0
+# -aiohttp>=3.8.0
+# -transformers>=4.21.0
+# -torch>=1.12.0
+# -Pillow>=9.0.0
+# -python-dotenv>=0.19.0
+*/
+
+-- Snowflake SVG Asset Management Schema
+
+-- Snowflake SVG Asset Management Schema
+-- Use the database and schema
+USE DATABASE MOTIONFUL_AI;
+USE SCHEMA SVG_ASSETS;
+
+-- 1. SVG Assets Table (Structured metadata)
+CREATE OR REPLACE TABLE SVG_ASSETS (
+    ASSET_ID STRING PRIMARY KEY,
+    TITLE STRING NOT NULL,
+    DESCRIPTION STRING,
+    CATEGORY STRING DEFAULT 'icons',
+    SOURCE_URL STRING,
+    TAGS VARIANT DEFAULT PARSE_JSON('[]'),
+    COLOR_PALETTE VARIANT DEFAULT PARSE_JSON('[]'),
+    DIMENSIONS VARIANT,
+    LICENSE STRING DEFAULT 'free',
+    CREATED_AT TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP(),
+    UPDATED_AT TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP()
+);
+
+-- 2. SVG Content Table (Unstructured SVG data)
+CREATE TABLE IF NOT EXISTS SVG_CONTENT (
+    ASSET_ID STRING,
+    SVG_DATA VARIANT, -- JSON containing SVG content
+    SVG_TEXT STRING, -- Text representation for search
+    SVG_METADATA VARIANT, -- Additional metadata
+    CREATED_AT TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP(),
+    FOREIGN KEY (ASSET_ID) REFERENCES SVG_ASSETS(ASSET_ID)
+);
+
+-- 3. SVG Embeddings Table (Vector embeddings)
+CREATE OR REPLACE TABLE SVG_EMBEDDINGS (
+    ASSET_ID STRING,
+    EMBEDDING_VECTOR VARIANT, -- Vector embedding stored as JSON array
+    EMBEDDING_MODEL STRING, -- Model used for embedding
+    CREATED_AT TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP(),
+    FOREIGN KEY (ASSET_ID) REFERENCES SVG_ASSETS(ASSET_ID)
+);
+
+-- 4. Usage Analytics Table
+CREATE TABLE IF NOT EXISTS SVG_USAGE_ANALYTICS (
+    USAGE_ID STRING DEFAULT UUID_STRING(),
+    ASSET_ID STRING,
+    QUERY_TEXT STRING,
+    SIMILARITY_SCORE FLOAT,
+    USED_AT TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP(),
+    USER_SESSION STRING,
+    FOREIGN KEY (ASSET_ID) REFERENCES SVG_ASSETS(ASSET_ID)
+);
+
+-- 5. Search Performance Table
+CREATE TABLE IF NOT EXISTS SEARCH_PERFORMANCE (
+    SEARCH_ID STRING DEFAULT UUID_STRING(),
+    QUERY_TEXT STRING,
+    RESULTS_COUNT INTEGER,
+    RESPONSE_TIME_MS INTEGER,
+    SEARCH_TYPE STRING, -- 'text', 'semantic', 'visual'
+    CREATED_AT TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP()
+);
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_svg_category ON SVG_ASSETS(CATEGORY);
+CREATE INDEX IF NOT EXISTS idx_svg_created ON SVG_ASSETS(CREATED_AT);
+CREATE INDEX IF NOT EXISTS idx_svg_tags ON SVG_ASSETS(TAGS);
+
+-- Create views for common queries
+CREATE OR REPLACE VIEW SVG_ASSETS_WITH_CONTENT AS
+SELECT 
+    a.ASSET_ID,
+    a.TITLE,
+    a.DESCRIPTION,
+    a.CATEGORY,
+    a.SOURCE_URL,
+    a.TAGS,
+    a.COLOR_PALETTE,
+    a.DIMENSIONS,
+    a.LICENSE,
+    a.CREATED_AT,
+    c.SVG_DATA,
+    c.SVG_TEXT
+FROM SVG_ASSETS a
+JOIN SVG_CONTENT c ON a.ASSET_ID = c.ASSET_ID;
+
+-- Create view for search analytics
+CREATE OR REPLACE VIEW SEARCH_ANALYTICS AS
+SELECT 
+    DATE_TRUNC('day', created_at) as search_date,
+    COUNT(*) as total_searches,
+    AVG(response_time_ms) as avg_response_time,
+    search_type,
+    COUNT(DISTINCT query_text) as unique_queries
+FROM SEARCH_PERFORMANCE
+GROUP BY DATE_TRUNC('day', created_at), search_type;
+
+-- Grant permissions (if needed)
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA SVG_ASSETS TO ROLE ACCOUNTADMIN;
+GRANT SELECT ON ALL VIEWS IN SCHEMA SVG_ASSETS TO ROLE ACCOUNTADMIN;
