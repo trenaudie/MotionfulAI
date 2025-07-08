@@ -33,23 +33,6 @@ export default makeScene2D(function* (view) {
         start={0}
         end={0}
       ></Path>
-      <Rect
-        ref={boundingBoxCircle} // Assign the ref to this Rect
-        stroke={'red'}        // Set stroke color to red
-        lineWidth={2}         // Set line width
-        fill={null}           // No fill
-        // Initially set size and position to 0 or default values.
-        // These will be updated once the Path's bounding box is calculated.
-        size={[0, 0]}
-      />
-      <Circle
-        ref={circle}
-        size={200}
-        stroke={'green'}
-        lineWidth={4}
-        start={0}
-        end={0}
-      />
     </Layout>
   );
 
@@ -58,24 +41,27 @@ export default makeScene2D(function* (view) {
 
   // Now that the path is rendered, we can safely get its bounding box.
   const bbox = path().getCacheBBox();
-  const bboxCircle = circle().getCacheBBox();
+  // const bboxCircle = circle().getCacheBBox();
   // Update the position and size of the boundingBoxRect using the calculated bbox.
   // The '0' duration means the change happens instantly.
   yield* boundingBoxRect().position(bbox.center, 0);
   console.log('bbox.position', bbox.center.x, bbox.center.y);
+  console.log('bbox absolute position', bbox.center.transformAsPoint(boundingBoxRect().localToParent()));
+  console.log('path absolute position', path().position().transformAsPoint(path().localToParent()));
   console.log('path position', path().position().x, path().position().y);
   yield* boundingBoxRect().size(bbox.size, 0);
-  yield* boundingBoxCircle().position(bboxCircle.center, 0);
-  console.log('bboxCircle.position', bboxCircle.center.x, bboxCircle.center.y);
-  console.log('circle position', circle().position().x, circle().position().y);
-  yield* boundingBoxCircle().size(bboxCircle.size, 0);
+  // yield* boundingBoxCircle().position(bboxCircle.center, 0);
+  // console.log('bboxCircle.position', bboxCircle.center.x, bboxCircle.center.y);
+  // console.log('circle position', circle().position().x, circle().position().y);
+  // yield* boundingBoxCircle().size(bboxCircle.size, 0);
 
 
   // Animate the drawing of the circle and path
-  yield* all(...[circle().end(1, 1), path().end(1, 1)]);
+  // yield* all(...[circle().end(1, 1), path().end(1, 1)]);
+  yield* path().end(1, 1);
 
 
   // Animate filling the circle and path with green color
-  yield* circle().fill('green', 2);
+  // yield* circle().fill('green', 2);
   yield* path().fill('green', 1);
 });

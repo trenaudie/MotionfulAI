@@ -1,0 +1,63 @@
+frontend
+├── CLAUDE.md
+├── node_modules
+│   ├── @esbuild
+....
+│   └── vite
+│       ├── bin
+│       ├── client.d.ts
+│       ├── dist
+│       ├── index.cjs
+│       ├── LICENSE.md
+│       ├── package.json
+│       ├── README.md
+│       └── types
+├── output
+│   └── project
+│       ├── 000000.png
+│       ├── 000001.plug
+...
+│       └── 000900.png
+├── package-lock.json
+├── package.json
+├── public
+├── src
+│   ├── motion-canvas.d.ts
+│   ├── project.meta
+│   ├── project.ts
+│   ├── scenes
+│   │   ├── example.tsx
+│   │   ├── lyt_horizontal1.meta
+│   │   └── lyt_horizontal1.tsx
+│   └── scenes2
+│       ├── ex11_graph_sandp.meta
+│       ├── ex11_graph_sandp.tsx
+│       ├── example.meta
+│       ├── example10_graph_with_tracing.meta
+│       ├── example10_graph_with_tracing.tsx
+│       ├── example10.meta
+│       ├── example2.meta
+│       ├── example2.tsx
+│       ├── example3.meta
+│       ├── example3.tsx
+│       ├── example4_grid.meta
+│       ├── example4_grid.tsx
+│       ├── example4.meta
+│       ├── example5.meta
+│       ├── example5.tsx
+│       ├── example6.meta
+│       ├── example6.tsx
+│       ├── example7.meta
+│       ├── example7.tsx
+│       ├── example8.meta
+│       ├── example8.tsx
+│       ├── example9_circle_cat.meta
+│       ├── example9_circle_cat.tsx
+│       ├── example9_graphs.meta
+│       ├── example9.tsx
+│       ├── utils.tsx
+│       └── visualize_interpolation_functions.tsx
+├── tsconfig.json
+└── vite.config.ts
+
+81 directories, 1086 files
